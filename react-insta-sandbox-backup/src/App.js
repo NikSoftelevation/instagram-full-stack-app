@@ -8,6 +8,7 @@ function App() {
       <Sidebar />
       {/* / <HomePage /> */}
     </div>
+
   );
 }
 

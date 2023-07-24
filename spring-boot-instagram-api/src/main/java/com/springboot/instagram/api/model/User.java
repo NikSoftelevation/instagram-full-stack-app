@@ -30,8 +30,18 @@ public class User {
     private String gender;
     private String image;
     private String password;
+
+    @Embedded
+    @ElementCollection
     private Set<UserDto> follower = new HashSet<>();
+
+    @Embedded
+    @ElementCollection
     private Set<UserDto> following = new HashSet<>();
+
+    @OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER)
     private List<Story> stories = new ArrayList<>();
+
+    @ManyToMany
     private List<Post> savedPost = new ArrayList<>();
 }

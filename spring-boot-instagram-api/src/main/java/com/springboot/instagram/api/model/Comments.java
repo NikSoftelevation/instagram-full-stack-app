@@ -2,10 +2,11 @@ package com.springboot.instagram.api.model;
 
 import com.springboot.instagram.api.dto.UserDto;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Builder
@@ -13,7 +14,8 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Story {
+public class Comments {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -23,10 +25,13 @@ public class Story {
             @AttributeOverride(name = "id", column = @Column(name = "user_id")),
             @AttributeOverride(name = "email", column = @Column(name = "user_email"))
     })
-
     private UserDto user;
-    @NotNull
-    private String image;
-    private String caption;
-    private LocalDateTime timeStamp;
+
+    private String content;
+
+    @Embedded
+    @ElementCollection
+    private Set<UserDto> likedByUsers = new HashSet<>();
+
+    private LocalDateTime createdAt;
 }
