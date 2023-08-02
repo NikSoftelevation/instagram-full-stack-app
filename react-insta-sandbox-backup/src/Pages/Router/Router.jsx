@@ -5,6 +5,7 @@ import Sidebar from "../../Components/ProfileComponent/Sidebar/Sidebar";
 import Profile from "../Profile/Profile";
 import Story from "../../Components/Story/Story";
 import { Auth } from "../Auth/Auth";
+import EditAccountDetails from "../../Components/EditAccount/EditAccountDetails";
 
 const Router = () => {
   const location = useLocation();
@@ -19,8 +20,13 @@ const Router = () => {
           <div className="w-full">
             <Routes>
               <Route path="/" element={<HomePage />}></Route>
-              <Route path="/username" element={<Profile />}></Route>
-              <Route path="/story" element={<Story />}></Route>
+              <Route path="/:username" element={<Profile />}></Route>
+              <Route path="/story/:userId" element={<Story />}></Route>
+              <Route path="/comment/:postId" element={<HomePage />}></Route>
+              <Route
+                path="/account/edit"
+                element={<EditAccountDetails />}
+              ></Route>
             </Routes>
           </div>
         </div>

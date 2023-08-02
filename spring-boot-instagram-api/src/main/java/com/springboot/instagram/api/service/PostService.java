@@ -23,6 +23,6 @@ public interface PostService {
 
     public Post likePost(int userId, int postId) throws UserException, PostException;
 
-    public Post unslikePost(int userId, int postId) throws UserException, PostException;
+    public Post unLikePost(int userId, int postId) throws UserException, PostException;
 
 }

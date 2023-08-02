@@ -65,10 +65,6 @@ public class PostServiceImpl implements PostService {
 
         List<Post> posts = postRepository.findByUserId(userId);
 
-        if (posts.size() == 0) {
-            throw new UserException("This user does not have any posts yet");
-        }
-
         return posts;
     }
 
@@ -152,7 +148,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post unslikePost(int userId, int postId) throws UserException, PostException {
+    public Post unLikePost(int userId, int postId) throws UserException, PostException {
 
         Post post = findPostById(postId);
 

@@ -3,21 +3,24 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, Switch } from '@chakra-ui/react';
 import { Provider } from 'react-redux';
 import { store } from './Redux/Store/store';
 import App from './App';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <ChakraProvider>
-        <Provider store={store} ><App /></Provider>
-      </ChakraProvider>
-    </BrowserRouter>
-  </React.StrictMode>,
-  document.getElementById('root')
 
+  <React.StrictMode>
+    <ChakraProvider>
+      <BrowserRouter>
+        <Switch>
+          <Provider store={store} ><App /></Provider>
+        </Switch>
+      </BrowserRouter>
+    </ChakraProvider>
+  </React.StrictMode>,
+
+  document.getElementById('root')
 
 );
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   BsBookmarkFill,
   BsThreeDots,
@@ -11,8 +11,26 @@ import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { FaRegComment } from "react-icons/fa";
 import { RiSendPlaneLine } from "react-icons/ri";
 import { CommentModel } from "../Comments/CommentModel";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  likePostAction,
+  savePostAction,
+  unLikePostAction,
+  unSavedPostAction,
+} from "../../Redux/Post/Action";
+import { isPostLikedByUser, isSavedPost } from "../../Config/Logics";
+import { useNavigate } from "react-router-dom";
 
-export const PostCard = () => {
+export const PostCard = ({ post }) => {
+  const dispatch = useDispatch();
+
+  const token = localStorage.getItem("token");
+  const { user } = useSelector((store) => store);
+
+  console.log("reqUser ----", user.reqUser);
+
+  const data = { jwt: token, postId: post?.id };
+
   const [showDropDown, setShowDropDown] = useState(false);
 
   const [isPostLike, setIsPostLike] = useState(false);
@@ -20,12 +38,21 @@ export const PostCard = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const navigate = useNavigate();
+
   const handleOpenCommentModal = () => {
+    navigate(`/comment/${post.id}`);
     onOpen();
   };
 
   const handlePostLike = () => {
-    setIsPostLike(!isPostLike);
+    setIsPostLike(true);
+    dispatch(likePostAction(data));
+  };
+
+  const handlePostUnLike = () => {
+    setIsPostLike(false);
+    dispatch(unLikePostAction(data));
   };
 
   const handleClick = () => {
@@ -33,8 +60,20 @@ export const PostCard = () => {
   };
 
   const handleSavePost = () => {
-    setIsSaved(!isSaved);
+    setIsSaved(!true);
+    dispatch(savePostAction(data));
   };
+
+  const handleUnsavedPost = () => {
+    setIsSaved(false);
+    dispatch(unSavedPostAction(data));
+  };
+
+  useEffect(() => {
+    setIsPostLike(isPostLikedByUser(post, user.reqUser?.id));
+
+    setIsSaved(isSavedPost(user.reqUser, post.id));
+  }, [post.likedByUsers, user.reqUser]);
 
   return (
     <div>
@@ -42,14 +81,17 @@ export const PostCard = () => {
         <div className="flex justify-between items-center w-full py-4 px-5">
           <div className="flex items-center">
             <img
-              className="h-12 w-12  rounded-full"
-              src="https://cdn.pixabay.com/photo/2023/06/01/06/03/fire-8032745_640.jpg"
+              className="h-12 w-12 rounded-full"
+              src={
+                post.user.userImage ||
+                "https://cdn.pixabay.com/photo/2023/06/05/08/41/bird-8041708_640.jpg"
+              }
               alt=""
             />
 
             <div className="pl-2">
-              <p className="font-semibold text-sm">Username</p>
-              <p className="font-thin text-sm">Location</p>
+              <p className="font-semibold text-sm">{post?.user.username}</p>
+              <p className="font-thin text-sm">{post.location}</p>
             </div>
           </div>
 
@@ -67,11 +109,7 @@ export const PostCard = () => {
         </div>
 
         <div className="w-full">
-          <img
-            className="w-full"
-            src="https://cdn.pixabay.com/photo/2023/06/19/15/48/butterfly-8074948_640.jpg"
-            alt=""
-          />
+          <img className="w-full" src={post?.image} alt="" />
         </div>
 
         <div className="flex justify-between items-center w-full px-5 py-4">
@@ -79,7 +117,7 @@ export const PostCard = () => {
             {isPostLike ? (
               <AiFillHeart
                 className="text-2xl hover:opacity-50 cursor-pointer text-red-600"
-                onClick={handlePostLike}
+                onClick={handlePostUnLike}
               />
             ) : (
               <AiOutlineHeart
@@ -99,7 +137,7 @@ export const PostCard = () => {
           <div className="cursor-pointer">
             {isSaved ? (
               <BsBookmarkFill
-                onClick={handleSavePost}
+                onClick={handleUnsavedPost}
                 className="text-xl hover:opacity-50 cursor-pointer"
               />
             ) : (
@@ -112,8 +150,14 @@ export const PostCard = () => {
         </div>
 
         <div className="w-full py-2 px-5">
-          <p>10 Likes</p>
-          <p className="opacity-50 py-2 cursor-pointer">View All 10 Comments</p>
+          {post?.likedByUsers?.length > 0 && (
+            <p>{post?.likedByUsers?.length}Likes</p>
+          )}
+          {post?.comments?.length > 0 && (
+            <p className="opacity-50 py-2 cursor-pointer">
+              View All {post?.comments?.length} Comments
+            </p>
+          )}
         </div>
 
         <div className="border border-t w-full">
@@ -128,7 +172,14 @@ export const PostCard = () => {
         </div>
       </div>
 
-      <CommentModel handlePostLike />
+      <CommentModel
+        handlePostLike={handlePostLike}
+        onClose={onClose}
+        isOpen={isOpen}
+        handleSavePost={handleSavePost}
+        isPostLike={isPostLike}
+        isSaved={isSaved}
+      />
     </div>
   );
 };

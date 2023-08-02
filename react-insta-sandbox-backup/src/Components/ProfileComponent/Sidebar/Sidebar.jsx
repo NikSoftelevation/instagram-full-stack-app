@@ -5,17 +5,19 @@ import { useNavigate } from "react-router-dom";
 import { useDisclosure } from "@chakra-ui/react";
 import { SearchComponents } from "../../SearchComponents/SearchComponents";
 import { CreatePostModel } from "../../Post/CreatePostModel";
+import { useSelector } from "react-redux";
 const Sidebar = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("");
   const [isopen, onClose, onOpen] = useDisclosure();
   const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const { user } = useSelector((store) => store);
 
   const handleTabClick = (title) => {
     setActiveTab(title);
 
     if (title === "Profile") {
-      navigate("/username");
+      navigate(`/${user.reqUser?.username}`);
     } else if (title === "Home") {
       navigate("/");
     } else if (title === "Create") {
@@ -31,7 +33,7 @@ const Sidebar = () => {
       <div className="flex flex-col justify-between h-full px-10">
         {
           <div>
-            {!activeTab === "Search" && (
+            {!activeTab !== "Search" && (
               <div className="pt-10">
                 <img
                   className="w-40"

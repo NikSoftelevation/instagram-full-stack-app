@@ -1,17 +1,20 @@
 import React from "react";
 
-const SuggestionCard = () => {
+const SuggestionCard = ({ user }) => {
   return (
     <div className="flex justify-between items-center">
       <div className="flex items-center">
         <img
           className="w-9 h-9 rounded-full"
-          src="https://cdn.pixabay.com/photo/2023/07/01/18/21/water-8100724_640.jpg"
+          src={
+            user.image ||
+            "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"
+          }
           alt=""
         />
         <div className="ml-2">
-          <p className="text-sm font-semibold">Username</p>
-          <p className="text-sm font-semibold opacity-70">Follows You</p>
+          <p className="text-sm font-semibold">{user.username}</p>
+          <p className="text-sm font-semibold opacity-70">Popular</p>
         </div>
       </div>
       <p className="text-blue-700 text-sm font-semibold">Follow</p>

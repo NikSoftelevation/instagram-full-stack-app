@@ -1,5 +1,5 @@
 import { Modal, ModalBody, ModalContent, ModalOverlay } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CommentCard from "./CommentCard";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { FaRegComment } from "react-icons/fa";
@@ -11,6 +11,14 @@ import {
   BsThreeDots,
 } from "react-icons/bs";
 import "./CommentModel.css";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  createCommentAction,
+  findPostCommentAction,
+} from "../../Redux/Comment/Action";
+import { useParams } from "react-router-dom";
+import { findPostByIdAction } from "../../Redux/Post/Action";
+import { timeDifference } from "../../Config/Logics";
 
 export const CommentModel = ({
   onClose,
@@ -20,6 +28,23 @@ export const CommentModel = ({
   handlePostLike,
   handleSavePost,
 }) => {
+  const [commentContent, setCommentContent] = useState();
+
+  const token = localStorage.getItem("token");
+
+  const { postId } = useParams();
+  const { comment, post, user } = useSelector((store) => store);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const data = { jwt: token, postId };
+
+    if (postId) {
+      dispatch(findPostByIdAction(data));
+    }
+  }, [comment.createdComment, postId]);
+
   return (
     <div>
       <Modal size={"4xl"} onClose={onClose} isOpen={isOpen} isCentered>
@@ -27,10 +52,11 @@ export const CommentModel = ({
         <ModalContent>
           <ModalBody>
             <div className="flex h-[75vh]">
-              <div className="w-[45%] flex-col justify-center">
+              <div className="w-[45%] flex flex-col justify-center">
                 <img
                   className="pt-40 max-h-full w-full"
-                  src="https://cdn.pixabay.com/photo/2023/05/15/09/18/iceberg-7994536_1280.jpg"
+                  src={post.singlePost?.image}
+                  // "https://cdn.pixabay.com/photo/2023/05/15/09/18/iceberg-7994536_1280.jpg"
                   alt=""
                 />
               </div>
@@ -40,13 +66,17 @@ export const CommentModel = ({
                     <div>
                       <img
                         className="w-9 h-9 rounded-full"
-                        src="https://cdn.pixabay.com/photo/2023/05/15/09/18/iceberg-7994536_1280.jpg"
+                        src={
+                          user.reqUser.image ||
+                          "https://cdn.pixabay.com/photo/2023/06/05/08/41/bird-8041708_640.jpg"
+                        }
+                        // "https://cdn.pixabay.com/photo/2023/05/15/09/18/iceberg-7994536_1280.jpg"
                         alt=""
                       />
                     </div>
 
                     <div className="ml-2">
-                      <p>Username</p>
+                      <p>{user.reqUser.username}</p>
                     </div>
                   </div>
 
@@ -55,8 +85,8 @@ export const CommentModel = ({
                 <hr />
 
                 <div className="comment">
-                  {[1].map(() => (
-                    <CommentCard />
+                  {post.singlePost.comments?.map((item) => (
+                    <CommentCard comment={item} />
                   ))}
                 </div>
 
@@ -95,8 +125,12 @@ export const CommentModel = ({
                     </div>
                   </div>
                   <div className="w-full py-2">
-                    <p>10 Likes</p>
-                    <p className="opacity-50 text-sm">1 day ago </p>
+                    {post.singlePost?.likedByUsers.length > 0 && (
+                      <p>{post.singlePost?.likedByUsers.length}Likes</p>
+                    )}
+                    <p className="opacity-50 text-sm">
+                      {timeDifference(post.singlePost?.createdAt)}{" "}
+                    </p>
                   </div>
 
                   <div className="flex items-center w-full">
@@ -105,6 +139,23 @@ export const CommentModel = ({
                       classname="commentInput"
                       type="text"
                       placeholder="Add a comment"
+                      onChange={(e) => setCommentContent(e.target.value)}
+                      value={commentContent}
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                          const data = {
+                            postId,
+                            jwt: token,
+                            data: {
+                              content: commentContent,
+                            },
+                          };
+
+                          dispatch(createCommentAction());
+
+                          setCommentContent("");
+                        }
+                      }}
                     />
                   </div>
                 </div>
